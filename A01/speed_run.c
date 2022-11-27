@@ -149,7 +149,7 @@ static void example(void)
 
 int main(int argc,char *argv[argc + 1])
 {
-# define _time_limit_  3600.0
+# define _time_limit_  72000.0
   int n_mec,final_position,print_this_one;
   char file_name[64];
 
