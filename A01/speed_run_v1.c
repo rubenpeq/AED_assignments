@@ -71,37 +71,46 @@ solution_t;
 // solution v1
 //
 
-static int distanceToStop(int current_speed){
-  return current_speed*(current_speed+1)/2;  // for(current_speed; current_speed>0; current_speed--){sum+=current_speed}
+static int distanceToStop(int speed){
+  return speed*(speed+1)/2;  // for(speed; speed>0; speed--){sum+=speed}
 }
 
 static int verifyOverSpeed(int new_speed, int position){  // true if new speed goes over the road limit
+  if(new_speed==0){
+    return 0;
+  }
   int i;
   for(i=0;i <= new_speed && new_speed <= max_road_speed[position + i];i++);
-  if(i > new_speed){
-    return 0;
+    if(i > new_speed){
+      return verifyOverSpeed(new_speed-1, position + new_speed);  // check if it has time to stop before future road limits
   }
   return 1;
 }
 
 static solution_t solution;
-static double solution_1_elapsed_time; // time it took to solve the problem
-static unsigned long solution_1_count; // effort dispended solving the problem
+static double solution_elapsed_time; // time it took to solve the problem
+static unsigned long solution_count; // effort dispended solving the problem
 
 static void solution_v1(int final_position)
 {
-    int speed = 0, position = 0;
-    for(position; position < final_position+1; position+=speed){
+    int speed = 0, position = 0, distance;
+    for(position; position <= final_position; position+=speed){
+      solution_count++;
       solution.positions[solution.n_moves++] = position;
-      if (distanceToStop(speed) + position == final_position && speed>1); // mantain speed
-      else if (distanceToStop(speed) + position > final_position && speed>1){ // decrease speed
+      distance = distanceToStop(speed) + position - final_position;
+      if (distance == 0 || distance == 1 && speed>=1); // mantain speed if distance is equal so it will gradually decrease speed in future cycles
+      else if (distance > 0 && speed>1){ // decrease speed because its reaching final stage
         speed--;
       }
-      else{ // try to increase speed if it ins't over speed limit
-        speed++;
-        while (verifyOverSpeed(speed, position)){
-          speed--;
-        }
+      else{ // try to increase speed
+          speed++;
+          for (int i=2; i>0; i--){
+            if (verifyOverSpeed(speed, position)){  // decrease speed if it goes over speed limit
+              speed--;
+            } else{
+              break;
+            }
+          }
       }
     }
     solution.n_moves--;
@@ -114,11 +123,11 @@ static void solve_1(int final_position)
     fprintf(stderr,"solve_1: bad final_position\n");
     exit(1);
   }
-  solution_1_elapsed_time = cpu_time();
-  solution_1_count = 0ul;
+  solution_elapsed_time = cpu_time();
+  solution_count = 0ul;
   solution.n_moves = 0;
   solution_v1(final_position);
-  solution_1_elapsed_time = cpu_time() - solution_1_elapsed_time;
+  solution_elapsed_time = cpu_time() - solution_elapsed_time;
 }
 
 
@@ -134,7 +143,7 @@ static void example(void)
   init_road_speeds();
   final_position = 30;
   solve_1(final_position);
-  make_custom_pdf_file("example.pdf",final_position,&max_road_speed[0],solution.n_moves,&solution.positions[0],solution_1_elapsed_time,solution_1_count,"Plain recursion");
+  make_custom_pdf_file("example.pdf",final_position,&max_road_speed[0],solution.n_moves,&solution.positions[0],solution_elapsed_time,solution_count,"Plain recursion");
   printf("mad road speeds:");
   for(i = 0;i <= final_position;i++)
     printf(" %d",max_road_speed[i]);
@@ -168,7 +177,7 @@ int main(int argc,char *argv[argc + 1])
   init_road_speeds();
   // run all solution methods for all interesting sizes of the problem
   final_position = 1;
-  solution_1_elapsed_time = 0.0;
+  solution_elapsed_time = 0.0;
   printf("    + --- ---------------- --------- +\n");
   printf("    |                plain recursion |\n");
   printf("--- + --- ---------------- --------- +\n");
@@ -179,15 +188,15 @@ int main(int argc,char *argv[argc + 1])
     print_this_one = (final_position == 10 || final_position == 20 || final_position == 50 || final_position == 100 || final_position == 200 || final_position == 400 || final_position == 800) ? 1 : 0;
     printf("%3d |",final_position);
     // first solution method (very bad)
-    if(solution_1_elapsed_time < _time_limit_)
+    if(solution_elapsed_time < _time_limit_)
     {
       solve_1(final_position);
       if(print_this_one != 0)
       {
-        sprintf(file_name,"%03d_v1.pdf",final_position);
-        make_custom_pdf_file(file_name,final_position,&max_road_speed[0],solution.n_moves,&solution.positions[0],solution_1_elapsed_time,solution_1_count,"For cycles");
+        sprintf(file_name,"speed_run_v1_values/%03d_v1.pdf",final_position);
+        make_custom_pdf_file(file_name,final_position,&max_road_speed[0],solution.n_moves,&solution.positions[0],solution_elapsed_time,solution_count,"For cycles");
       }
-      printf(" %3d %16lu %9.3e |",solution.n_moves,solution_1_count,solution_1_elapsed_time);
+      printf(" %3d %16lu %9.3e |",solution.n_moves,solution_count,solution_elapsed_time);
     }
     else
     {
