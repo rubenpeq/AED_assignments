@@ -112,7 +112,7 @@ static void solution_v1(int final_position)
         speed--;
       }
       else{ // mantain speed
-        if (verifyOverSpeed(speed, position)){  // decrease speed if it goes over speed limit
+        if (verifyOverSpeed(speed, position) && speed>1){  // decrease speed if it goes over speed limit
               speed--;
             }
       }
