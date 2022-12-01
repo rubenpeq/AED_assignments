@@ -197,7 +197,7 @@ int main(int argc,char *argv[argc + 1])
       solve_1(final_position);
       if(print_this_one != 0)
       {
-        sprintf(file_name,"speed_run_v1_values/%03d_v1.pdf",final_position);
+        sprintf(file_name,"%03d_v1.pdf",final_position);
         make_custom_pdf_file(file_name,final_position,&max_road_speed[0],solution.n_moves,&solution.positions[0],solution_elapsed_time,solution_count,"For cycles");
       }
       printf(" %3d %16lu %9.3e |",solution.n_moves,solution_count,solution_elapsed_time);
