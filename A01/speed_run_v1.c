@@ -111,6 +111,11 @@ static void solution_v1(int final_position)
             }
           }
       }
+      else{ // mantain speed
+        if (verifyOverSpeed(speed, position)){  // decrease speed if it goes over speed limit
+              speed--;
+            }
+      }
     }
     solution.n_moves--;
 }
@@ -184,7 +189,7 @@ int main(int argc,char *argv[argc + 1])
   printf("--- + --- ---------------- --------- +\n");
   while(final_position <= _max_road_size_/* && final_position <= 20*/)
   {
-    print_this_one = (final_position >=30 && final_position <=40 || final_position == 800) ? 1 : 0;
+    print_this_one = (final_position == 10 || final_position == 20 || final_position == 50 || final_position == 100 || final_position == 200 || final_position == 400 || final_position == 800) ? 1 : 0;
     printf("%3d |",final_position);
     // first solution method (very bad)
     if(solution_elapsed_time < _time_limit_)
