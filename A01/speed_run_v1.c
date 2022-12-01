@@ -98,11 +98,10 @@ static void solution_v1(int final_position)
       solution_count++;
       solution.positions[solution.n_moves++] = position;
       distance = distanceToStop(speed) + position - final_position;
-      if (distance == 0 || distance == 1 && speed>=1); // mantain speed if distance is equal so it will gradually decrease speed in future cycles
-      else if (distance > 0 && speed>1){ // decrease speed because its reaching final stage
+      if (distance > 0 && speed>1){ // decrease speed because its reaching final stage
         speed--;
       }
-      else{ // try to increase speed
+      else if (distance < -speed){ // try to increase speed
           speed++;
           for (int i=2; i>0; i--){
             if (verifyOverSpeed(speed, position)){  // decrease speed if it goes over speed limit
@@ -185,7 +184,7 @@ int main(int argc,char *argv[argc + 1])
   printf("--- + --- ---------------- --------- +\n");
   while(final_position <= _max_road_size_/* && final_position <= 20*/)
   {
-    print_this_one = (final_position == 10 || final_position == 20 || final_position == 50 || final_position == 100 || final_position == 200 || final_position == 400 || final_position == 800) ? 1 : 0;
+    print_this_one = (final_position >=30 && final_position <=40 || final_position == 800) ? 1 : 0;
     printf("%3d |",final_position);
     // first solution method (very bad)
     if(solution_elapsed_time < _time_limit_)
