@@ -71,7 +71,7 @@ solution_t;
 // solution v1
 //
 
-static int distanceToStop(int speed){
+static int distanceToStop(int speed){ // distance required to stop at a certain speed
   return speed*(speed+1)/2;  // for(speed; speed>0; speed--){sum+=speed}
 }
 
@@ -98,18 +98,18 @@ static void solution_v1(int final_position)
       solution_count++;
       solution.positions[solution.n_moves++] = position;
       distance = distanceToStop(speed) + position - final_position;
-      if (distance > 0 && speed>1){ // decrease speed because its reaching final stage
-        speed--;
-      }
-      else if (distance < -speed){ // try to increase speed
-          speed++;
+      if (distance < -speed){ // try to increase speed
+          speed++;  // start testing at speed+1
           for (int i=2; i>0; i--){
-            if (verifyOverSpeed(speed, position)){  // decrease speed if it goes over speed limit
+            if(verifyOverSpeed(speed, position)){  // decrease speed if it goes over speed limit
               speed--;
             } else{
-              break;
+              break;  // doesn't need to check slower speeds if higher is possible
             }
           }
+      }
+      else if(distance > 0 && speed>1){ // decrease speed because its reaching final position
+        speed--;
       }
       else{ // mantain speed
         if (verifyOverSpeed(speed, position)){  // decrease speed if it goes over speed limit
